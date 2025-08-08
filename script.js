@@ -113,20 +113,21 @@
     const grand = subtotal - discount;
 
     // Output
-    el('labourTotal').textContent = fmt(labourBase);
-    el('stairSurcharge').textContent = fmt(stairUplift);
-    el('tightSurcharge').textContent = fmt(tightUplift);
-    el('prepTotal').textContent = fmt(prepCost);
-    el('paintTotal').textContent = fmt(paintCost);
-    el('woodTotal').textContent = fmt(woodCost);
-    el('defectTotal').textContent = fmt(defectCost);
-    el('equipWasteTotal').textContent = fmt(equipWaste);
-    el('consumTotal').textContent = fmt(consumCost);
-    el('sprayCosts').textContent = fmt(sprayCost);
-    el('contingency').textContent = fmt(contingency);
-    el('subtotal').textContent = fmt(subtotal);
+    const set=(id,val)=>{const n=el(id); if(n) n.textContent=fmt(val);};
+    set('labourTotal', labourBase);
+    set('stairSurcharge', stairUplift);
+    set('tightSurcharge', tightUplift);
+    set('prepTotal', prepCost);
+    set('paintTotal', paintCost);
+    set('woodTotal', woodCost);
+    set('defectTotal', defectCost);
+    set('equipWasteTotal', equipWaste);
+    set('consumTotal', consumCost);
+    set('sprayCosts', sprayCost);
+    set('contingency', contingency);
+    set('subtotal', subtotal);
     el('discountOut').textContent = '-'+fmt(discount);
-    el('grandTotal').textContent = fmt(grand);
+    set('grandTotal', grand);
 
     el('intLitres').textContent = intLitres;
     el('extLitres').textContent = extLitres;
@@ -150,21 +151,14 @@
       discount:0
     };
     if(kind==='interior'){
-      base.usePrimer='no';
-      base.finishCoats=2;
+      base.usePrimer='no'; base.finishCoats=2;
     }else if(kind==='refurb'){
-      base.usePrimer='yes';
-      base.finishCoats=2;
-      base.dayRate=190;
-      base.consumables=50;
-      base.contingencyPct=8;
-      base.patchPrice=22;
+      base.usePrimer='yes'; base.finishCoats=2;
+      base.dayRate=190; base.consumables=50; base.contingencyPct=8; base.patchPrice=22;
     }else if(kind==='exterior'){
-      base.usePrimer='no';
-      base.finishCoats=2;
-      base.extMethod='spray';
-      base.sprayPerDay=25;
-      ['kWalls','kCeil','bWalls','bCeil','sWalls','sCeil','oWalls','oCeil'].forEach(id=>{ document.getElementById(id).value=0; });
+      base.usePrimer='no'; base.finishCoats=2;
+      base.extMethod='spray'; base.sprayPerDay=25;
+      ['kWalls','kCeil','bWalls','bCeil','sWalls','sCeil','oWalls','oCeil'].forEach(id=>{ const n=document.getElementById(id); if(n) n.value=0; });
     }
     Object.entries(base).forEach(([k,v])=>{
       const node=document.getElementById(k);
@@ -178,33 +172,28 @@
   // Save/Load/Reset/Print
   function saveJob(){
     const data={};
-    ids.forEach(id=>data[id]=document.getElementById(id).value);
-    localStorage.setItem('paintingQuoteJobV3', JSON.stringify(data));
+    ids.forEach(id=>{ const n=document.getElementById(id); if(n) data[id]=n.value; });
+    localStorage.setItem('paintingQuoteJobV31', JSON.stringify(data));
     alert('Saved locally.');
   }
   function loadJob(){
-    const raw=localStorage.getItem('paintingQuoteJobV3');
+    const raw=localStorage.getItem('paintingQuoteJobV31');
     if(!raw){ alert('Nothing saved yet.'); return; }
     const data=JSON.parse(raw);
-    ids.forEach(id=>{ if(data[id]!==undefined) document.getElementById(id).value = data[id]; });
+    ids.forEach(id=>{ const n=document.getElementById(id); if(n && data[id]!==undefined) n.value=data[id]; });
     calc();
   }
   function resetAll(){
     if(!confirm('Reset all fields?')) return;
-    ids.forEach(id=>{
-      const node=document.getElementById(id);
-      if(node && node.tagName==='SELECT') node.selectedIndex=0;
-      else if(node) node.value=0;
-    });
+    ids.forEach(id=>{ const n=document.getElementById(id); if(!n) return; if(n.tagName==='SELECT') n.selectedIndex=0; else n.value=0; });
     applyPreset('interior');
   }
 
   // Hook events
   ids.forEach(id=>{
-    const node=el(id);
-    if(!node) return;
-    node.addEventListener('input', calc);
-    node.addEventListener('change', calc);
+    const n=el(id); if(!n) return;
+    n.addEventListener('input', calc);
+    n.addEventListener('change', calc);
   });
   Array.from(document.querySelectorAll('[data-preset]')).forEach(btn=>{
     btn.addEventListener('click', ()=>applyPreset(btn.dataset.preset));
